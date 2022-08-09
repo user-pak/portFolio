@@ -1,0 +1,75 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberMapper">
+	<resultMap type="Member" id="memberMap">
+		<id property="mId" column="MID"/>
+		<result property="id" column="ID"/>
+		<result property="name" column="NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="no" column="ENC_NO"/>
+		<result property="email" column="EMAIL"/>
+		<result property="phone" column="PHONE"/>
+		<result property="address" column="ADDRESS"/>
+	</resultMap>
+	<resultMap type="Rent" id="rentMap">
+		<id property="rentNo" column="RENT_NO"/>
+		<result property="refBno" column="RENT_BOOK_NO"/>
+		<result property="bookName" column="BK_TITLE"/>
+		<result property="refMemId" column="RENT_MEMBER_ID"/>
+		<result property="rentDate" column="RENT_DATE"/>
+		<result property="returnDate" column="RETURN_DATE"/>
+		<result property="returnCk" column="RETURN_CK"/>
+	</resultMap>
+	<select id="historyRentList" resultMap="rentMap">
+		SELECT TB_RENT.*, BK_TITLE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO
+		<!-- SELECT RENT_NO, BK_TITLE,RENT_BOOK_NO, RENT_MEMBER_ID, RENT_DATE,(CASE WHEN RETURN_CK =1 THEN '반납완료' ELSE IF(RETURN_DATE <![CDATA[ < ]]> CURRENT_TIMESTAMP,'연체중',RETURN_DATE) END)AS RETURN_DATE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO-->
+		<where>	
+			<if test="id != null">
+				 RENT_MEMBER_ID = #{id}
+			</if>
+		</where>
+		ORDER BY RENT_DATE DESC
+	</select>
+	<insert id="insertRentBook">
+		INSERT INTO TB_RENT(RENT_BOOK_NO, RENT_MEMBER_ID, RENT_DATE, RETURN_DATE, RETURN_CK) VALUES(#{refBno},#{refMemId},DEFAULT,DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY),DEFAULT)
+	</insert>
+		<select id="selectLoginMember" resultMap="memberMap">
+		SELECT * FROM MEMBER WHERE ID=#{id} AND PASSWORD=#{password} AND M_STATUS = 'Y'
+	</select>
+	<insert id="register">
+		INSERT INTO MEMBER (ID,NAME,EMAIL,PASSWORD,M_STATUS) VALUES(#{id},#{name},NULLIF(#{email},''),#{password},DEFAULT)
+	</insert>
+	<insert id="insertWishBook">
+		INSERT INTO TB_WISH_BOOK(W_PUBLISHER,W_AUTHOR,W_BOOK_TITLE,USER_ID,W_CREATE_DATE) VALUES(#{publisherNo},#{author},#{bookTitle},#{ISBN},DEFAULT)
+	</insert>
+	<update id="deleteMember">
+		UPDATE MEMBER SET M_STATUS = 'N' WHERE ID=#{id}
+	</update>
+	<update id="updateMember">
+		UPDATE MEMBER SET NAME=#{name}, email=NULLIF(#{email},''), phone=NULLIF(#{phone},''), address=NULLIF(#{address},'') WHERE ID=#{id}
+	</update>
+	<select id="checkDuplId" resultType="_int">
+		SELECT COUNT(*) FROM MEMBER WHERE ID=#{id}
+	</select>
+	<update id="changePassword">
+		UPDATE MEMBER SET PASSWORD = #{password} WHERE ID=#{id}
+	</update>
+	<select id="getDueCount" resultType="_int">
+		SELECT COUNT(*) FROM (SELECT * FROM TB_RENT WHERE RENT_MEMBER_ID=#{id})R WHERE RETURN_CK <![CDATA[ < ]]> 1 AND RETURN_DATE <![CDATA[ < ]]> CURRENT_TIMESTAMP
+	</select>
+	<update id="updateRentBook">
+		UPDATE TB_RENT SET RETURN_CK = 1, RETURN_DATE = CURRENT_TIMESTAMP WHERE RENT_BOOK_NO = #{refBno} AND RENT_MEMBER_ID = #{refMemId}
+	</update>
+	<resultMap type="Reply" id="replyMap">
+		<id property="replyNo" column="R_NO"/>
+		<result property="refBno" column="REF_BNO"/>
+		<result property="replyAuthor" column="R_AUTHOR"/>
+		<result property="replyContent" column="R_CONTENT"/>
+		<result property="replyCreateDate" column="R_CREATE_DATE"/>
+		<result property="replyStatus" column="R_STATUS"/>
+	</resultMap>
+	<select id="getReplyRefList" resultMap="replyMap">
+		SELECT * FROM REPLY WHERE REF_BNO IN (SELECT B_NO FROM BOARD WHERE B_AUTHOR=#{id}) AND R_CREATE_DATE BETWEEN CURDATE() AND CURRENT_TIMESTAMP AND R_STATUS = 'Y' AND NOT R_AUTHOR = #{id} AND CHECK_YN = 'N'
+	</select>
+</mapper>

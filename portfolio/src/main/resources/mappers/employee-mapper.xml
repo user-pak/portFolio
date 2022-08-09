@@ -1,0 +1,144 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EmployeeMapper">
+	<resultMap type="Member" id="memberMap">
+		<id property="mId" column="MID"/>
+		<result property="id" column="ID"/>
+		<result property="name" column="NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="no" column="ENC_NO"/>
+		<result property="email" column="EMAIL"/>
+		<result property="phone" column="PHONE"/>
+		<result property="address" column="ADDRESS"/>
+		<result property="createDate" column="CREATE_DATE"/>
+	</resultMap>
+	<resultMap type="Employee" id="employeeMap">
+		<id property="empNo" column ="EMP_NO"/>
+		<result property="id" column="MEMBER_ID"/>
+		<result property="name" column="NAME"/>
+		<result property="no" column="ENC_NO"/>
+		<result property="email" column="EMAIL"/>
+		<result property="phone" column="PHONE"/>
+		<result property="deptCode" column ="DEPT_TITLE"/>
+		<result property="jobCode" column="JOB_NAME"/>
+		<result property="salaryLevel" column="SAL_NAME"/>
+		<result property="salary" column="SALARY"/>
+		<result property="bonus" column="BONUS"/>
+		<result property="managerId" column="MANAGER_NAME"/>
+		<result property="hireDate" column="HIRE_DATE"/>
+		<result property="entDate" column="ENT_DATE"/>
+		<result property="entYn" column="ENT_YN"/>
+		<result property="empCreateDate" column="CREATE_DATE"/>
+	</resultMap>
+		<resultMap type="Employee" id="updateemployeeMap">
+		<id property="empNo" column ="EMP_NO"/>
+		<result property="id" column="ID"/>
+		<result property="name" column="NAME"/>
+		<result property="no" column="NO"/>
+		<result property="email" column="EMAIL"/>
+		<result property="phone" column="PHONE"/>
+		<result property="deptCode" column ="DEPT_CODE"/>
+		<result property="jobCode" column="JOB_CODE"/>
+		<result property="salaryLevel" column="SAL_LEVEL"/>
+		<result property="salary" column="SALARY"/>
+		<result property="bonus" column="BONUS"/>
+		<result property="managerId" column="MANAGER_NAME"/>
+		<result property="hireDate" column="HIRE_DATE"/>
+		<result property="entDate" column="ENT_DATE"/>
+		<result property="entYn" column="ENT_YN"/>
+	</resultMap>
+	<select id="selectEmployeeList" resultMap="employeeMap">
+		CREATE OR REPLACE VIEW SELECT_MANAGER AS SELECT ID, NAME, DEPT_TITLE, JOB_NAME FROM EMPLOYEE LEFT JOIN MEMBER ON ID=MEMBER_ID LEFT JOIN DEPARTMENT ON DEPT_CODE = DEPT_ID LEFT JOIN JOB USING(JOB_CODE) WHERE ENT_YN='N';
+		<!-- SELECT MEMBER.ID, MEMBER.NAME, CONCAT(SUBSTR(MEMBER.NO,1,7),'******')AS ENC_NO,MEMBER.EMAIL, MEMBER.PHONE,MEMBERDEPARTMENT.DEPT_TITLE, MEMBERJOB.JOB_NAME, EMPLOYEE.*, MANAGER.ID AS MANAGER_ID, CONCAT(IFNULL(SEL.DEPT_TITLE,'(부서없음)'),SEL.NAME,IFNULL(SEL.JOB_NAME,'(직급없음)')) AS MANAGER_NAME FROM MEMBER LEFT JOIN EMPLOYEE ON MEMBER.ID= EMPLOYEE.MEMBER_ID LEFT JOIN DEPARTMENT AS MEMBERDEPARTMENT ON EMPLOYEE.DEPT_CODE=MEMBERDEPARTMENT.DEPT_ID LEFT JOIN JOB AS MEMBERJOB ON EMPLOYEE.JOB_CODE = MEMBERJOB.JOB_CODE LEFT JOIN MEMBER AS MANAGER ON EMPLOYEE.MANAGER_ID = MANAGER.ID LEFT JOIN SELECT_MANAGER SEL ON EMPLOYEE.MANAGER_ID= SEL.ID WHERE MEMBER.M_STATUS= 'Y' AND EMPLOYEE.ENT_YN = 'N'
+	</select> -->
+		SELECT MEMBER.ID, MEMBER.NAME, CONCAT(SUBSTR(MEMBER.NO,1,7),'******')AS ENC_NO,MEMBER.EMAIL, MEMBER.PHONE,MEMBERDEPARTMENT.DEPT_TITLE, MEMBERJOB.JOB_NAME, EMPLOYEE.*,SAL_GRADE.SAL_NAME, MANAGER.ID AS MANAGER_ID, CONCAT(IFNULL(SEL.DEPT_TITLE,'(부서없음)'),SEL.NAME,IFNULL(SEL.JOB_NAME,'(직급없음)')) AS MANAGER_NAME FROM MEMBER LEFT JOIN EMPLOYEE ON MEMBER.ID= EMPLOYEE.MEMBER_ID LEFT JOIN DEPARTMENT AS MEMBERDEPARTMENT ON EMPLOYEE.DEPT_CODE=MEMBERDEPARTMENT.DEPT_ID LEFT JOIN JOB AS MEMBERJOB ON EMPLOYEE.JOB_CODE = MEMBERJOB.JOB_CODE LEFT JOIN SAL_GRADE ON EMPLOYEE.SAL_LEVEL = SAL_GRADE.SAL_LEVEL LEFT JOIN MEMBER AS MANAGER ON EMPLOYEE.MANAGER_ID = MANAGER.ID LEFT JOIN SELECT_MANAGER SEL ON EMPLOYEE.MANAGER_ID= SEL.ID WHERE MEMBER.M_STATUS= 'Y' AND EMPLOYEE.ENT_YN = 'N'
+	</select>
+	<select id="selectMemberList" resultMap="memberMap">
+		SELECT ID,NAME, CONCAT(SUBSTR(NO,1,7),'******')AS ENC_NO, EMAIL,PHONE,M_STATUS,MEMBER.CREATE_DATE FROM MEMBER LEFT JOIN EMPLOYEE ON ID=MEMBER_ID WHERE M_STATUS= 'Y' AND EMP_NO IS NULL ORDER BY MEMBER.CREATE_DATE DESC
+	</select>
+	<insert id="registerEmp">
+		<!-- SET @salLevel := (SELECT SAL_LEVEL FROM SAL_GRADE WHERE #{salary} BETWEEN MIN_SAL AND MAX_SAL); -->
+		INSERT INTO EMPLOYEE(MEMBER_ID,DEPT_CODE,JOB_CODE,SALARY,SAL_LEVEL,BONUS,MANAGER_ID,HIRE_DATE,ENT_YN,CREATE_DATE) VALUES(#{id},NULLIF(#{deptCode},''),NULLIF(#{jobCode},''),NULLIF(#{salary},0),#{salaryLevel},#{bonus}, NULLIF(#{managerId},''), NULLIF(#{hireDate},''), DEFAULT,DEFAULT)
+	</insert>
+	<select id="selectManager" resultType="java.util.Map">
+		SELECT MEMBER_ID, CONCAT(NAME,IFNULL(JOB_NAME, '(직급없음)'))AS NAME_JOB FROM MEMBER RIGHT JOIN EMPLOYEE ON ID=MEMBER_ID LEFT JOIN JOB USING(JOB_CODE) WHERE ENT_YN = 'N' AND DEPT_CODE = #{deptCode} AND NOT EMP_NO = #{empNo} AND JOB_CODE <![CDATA[<]]> (SELECT IFNULL(JOB_CODE,'J7') FROM EMPLOYEE E WHERE E.EMP_NO = #{empNo})
+	</select>
+	<select id="selectMember" resultMap="memberMap">
+		SELECT ID,NAME, CONCAT(SUBSTR(NO,1,7),'******')AS ENC_NO, EMAIL,PHONE,M_STATUS FROM MEMBER WHERE ID= #{id} AND M_STATUS= 'Y'
+	</select>
+	<select id="selectEmployee" resultMap="updateemployeeMap">
+		<!-- SELECT EMPLOYEE.*,ID,NAME, CONCAT(SUBSTR(NO,1,7),'******')AS ENC_NO, EMAIL,PHONE,M_STATUS, (SELECT NAME FROM MEMBER WHERE ID=EMPLOYEE.MANAGER_ID AND ENT_YN='N')AS MANAGER_NAME FROM MEMBER JOIN EMPLOYEE ON ID = MEMBER_ID WHERE EMP_NO = #{empNo}
+	</select> -->
+		SELECT MEMBER.ID,MEMBER.NAME,CONCAT(SUBSTR(NO,1,7),'******')AS ENC_NO,EMAIL,PHONE,M_STATUS,EMP_NO,DEPT_CODE,JOB_CODE,SAL_LEVEL,SALARY,BONUS,HIRE_DATE,SEL.ID AS MANAGER_ID,SEL.NAME AS MANAGER_NAME FROM EMPLOYEE LEFT JOIN MEMBER ON MEMBER.ID = MEMBER_ID LEFT JOIN SELECT_MANAGER AS SEL ON EMPLOYEE.MANAGER_ID = SEL.ID WHERE ENT_YN = 'N' AND EMP_NO=#{empNo}
+	</select>
+	<update id="updateEmp">
+	<!-- 	SET @salLevel := (SELECT SAL_LEVEL FROM SAL_GRADE WHERE #{salary} BETWEEN MIN_SAL AND MAX_SAL); -->
+		UPDATE EMPLOYEE SET DEPT_CODE = NULLIF(#{deptCode},''), JOB_CODE = NULLIF(#{jobCode},''), SAL_LEVEL = #{salaryLevel}, SALARY = #{salary}, BONUS= #{bonus}, MANAGER_ID = NULLIF(#{managerId},''), HIRE_DATE = NULLIF(#{hireDate},'') WHERE EMP_NO = #{empNo}
+	</update>
+	<update id="deleteEmp">
+		UPDATE EMPLOYEE SET ENT_YN ='Y', ENT_DATE = CURRENT_TIMESTAMP WHERE EMP_NO = #{empNo}
+	</update>
+	<select id="getSalLevel" resultType="String">
+		SELECT SAL_LEVEL FROM SAL_GRADE WHERE #{salary} BETWEEN MIN_SAL AND MAX_SAL
+	</select>
+	<resultMap type="EmployeeOption" id="departmentMap">
+		<id property="codeId" column="DEPT_ID"/>
+		<result property="codeName" column="DEPT_TITLE"/>
+	</resultMap>
+	<select id="selectDeptList" resultMap="departmentMap">
+		SELECT * FROM DEPARTMENT
+	</select>
+	<resultMap type="EmployeeOption" id="jobMap">
+		<id property="codeId" column="JOB_CODE"/>
+		<result property="codeName" column="JOB_NAME"/>
+	</resultMap>
+	<select id="selectJobList" resultMap="jobMap">
+		SELECT * FROM JOB
+	</select>
+	<resultMap type="EmployeeOption" id="salGradeMap">
+		<id property="codeId" column="SAL_LEVEL"/>
+		<result property="codeName" column="SAL_NAME"/>
+		<result property="minSal" column="MIN_SAL"/>
+		<result property="maxSal" column="MAX_SAL"/>
+	</resultMap>
+	<select id="selectSalGradeList" resultMap="salGradeMap">
+		SELECT * FROM SAL_GRADE
+	</select>
+	<insert id="insertDeptList" parameterType="java.util.ArrayList">
+		INSERT INTO DEPARTMENT VALUES
+		<foreach collection="collection" item="deptList" separator=",">
+			(#{deptList.codeId},#{deptList.codeName})
+		</foreach>
+	</insert>
+	<insert id="insertJobList" parameterType="java.util.ArrayList">
+		INSERT INTO JOB VALUES
+		<foreach collection="collection" item="jobList" separator=",">
+			(#{jobList.codeId},#{jobList.codeName})
+		</foreach>
+	</insert>
+	<insert id="insertSalGradeList" parameterType="java.util.ArrayList">
+		INSERT INTO SAL_GRADE VALUES
+		<foreach collection="collection" item="salGradeList" separator=",">
+			(#{salGradeList.codeId},#{salGradeList.minSal},#{salGradeList.maxSal},#{salGradeList.codeName})
+		</foreach>
+	</insert>
+	<delete id="deleteDeptList" parameterType="java.util.ArrayList">
+		DELETE FROM DEPARTMENT WHERE DEPT_ID IN
+		<foreach collection="list" item="deptDelList" open="(" separator="," close=")">
+			#{deptDelList}
+		</foreach>
+	</delete>
+	<delete id="deleteJobList" parameterType="java.util.ArrayList">
+		DELETE FROM JOB WHERE JOB_CODE IN
+		<foreach collection="list" item="jobDelList" open="(" separator="," close=")">
+			#{jobDelList}
+		</foreach>
+	</delete>
+	<delete id="deleteSalGradeDelList" parameterType="java.util.ArrayList">
+		DELETE FROM SAL_GRADE WHERE SAL_LEVEL IN
+		<foreach collection="list" item="salGradeDelList" open="(" separator="," close=")">
+			#{salGradeDelList}
+		</foreach>
+	</delete>
+</mapper>

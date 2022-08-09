@@ -1,0 +1,46 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HomeMapper">
+	<select id="getNewMemberCount" resultType="_int">
+		SELECT COUNT(*) FROM MEMBER WHERE CREATE_DATE BETWEEN CURDATE() AND CURRENT_TIMESTAMP
+	</select>
+	<select id="getNewWishBookCount" resultType="_int">
+		SELECT COUNT(*) FROM TB_WISH_BOOK WHERE W_CREATE_DATE BETWEEN CURDATE() AND CURRENT_TIMESTAMP
+	</select>
+ 	<select id="getBookTitleImg" resultType="String">
+		SELECT RENAME_FILENAME FROM TB_BOOK WHERE RENAME_FILENAME IS NOT NULL AND B_STATUS = 'Y' ORDER BY CREATE_DATE DESC LIMIT 1
+	</select>
+	<select id="getBorrowTopList" resultType="java.util.Map">
+		SELECT BK_TITLE, RENT_COUNT FROM TB_BOOK ORDER BY RENT_COUNT DESC LIMIT 5
+	</select>
+	<insert id="insertNotice">
+		INSERT INTO TB_NOTICE(NOTICE_TITLE,NOTICE_CATEGORY,CREATE_DATE,NOTICE_STATUS,CONTENT) VALUES(#{noticeTitle},#{noticeCategory},DEFAULT,DEFAULT,#{content})
+	</insert>
+	<update id="updateNotice">
+		UPDATE TB_NOTICE SET NOTICE_TITLE=#{noticeTitle}, NOTICE_CATEGORY = #{noticeCategory}, CREATE_DATE=CURRENT_TIMESTAMP, CONTENT=#{content} WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	<update id="deleteNotice">
+		UPDATE TB_NOTICE SET NOTICE_STATUS = 'N' WHERE NOTICE_NO= #{noticeNo}
+	</update>
+	<resultMap type="Notice" id="noticeMap">
+		<id property="noticeNo" column="NOTICE_NO"/>
+		<result property="noticeTitle" column="NOTICE_TITLE"/>
+		<result property="noticeCategory" column="NOTICE_CATEGORY"/>
+		<result property="createDate" column="CREATE_DATE"/>
+		<result property="noticeStatus" column="NOTICE_STATUS"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+	<select id="selectNoticeDetail" resultMap="noticeMap">
+		SELECT * FROM TB_NOTICE WHERE NOTICE_NO = #{noticeNo} AND NOTICE_STATUS= 'Y'
+	</select>
+	<select id="selectNoticeList" resultMap="noticeMap">
+		SELECT * FROM TB_NOTICE WHERE NOTICE_STATUS = 'Y'
+	</select>
+	<select id="getRecentNotices" resultMap="noticeMap">
+		SELECT ORD.NOTICE_NO,ORD.NOTICE_CATEGORY,ORD.NOTICE_TITLE, ORD.CREATE_DATE FROM (SELECT * FROM TB_NOTICE WHERE NOTICE_STATUS = 'Y' ORDER BY CREATE_DATE DESC) ORD LIMIT 3
+	</select>
+	<select id="getTopBoardTitle" resultType="String">
+		SELECT ORB.B_TITLE FROM (SELECT * FROM BOARD WHERE B_STATUS = 'Y' ORDER BY B_COUNT DESC) ORB LIMIT 1
+	</select>
+</mapper>

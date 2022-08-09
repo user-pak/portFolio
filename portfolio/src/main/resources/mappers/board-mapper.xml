@@ -1,0 +1,56 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardMapper">
+	<insert id="insertBoard">
+		INSERT INTO BOARD(B_TITLE,B_AUTHOR,B_CONTENT,B_CREATE_DATE,B_STATUS,B_COUNT) VALUES(#{boardTitle},#{boardAuthor},#{boardContent},DEFAULT,DEFAULT,DEFAULT)
+	</insert>
+	<resultMap type="Board" id="boardMap">
+		<id property="boardNo" column="B_NO"/>
+		<result property="boardTitle" column="B_TITLE"/>
+		<result property="boardAuthor" column="B_AUTHOR"/>
+		<result property="boardContent" column="B_CONTENT"/>
+		<result property="createDate" column="B_CREATE_DATE"/>
+		<result property="boardStatus" column="B_STATUS"/>
+		<result property="boardCount" column="B_COUNT"/>
+		<collection property="replyList" ofType="Reply" resultMap="replyMap"></collection>
+	</resultMap>
+	<select id="selectBoardList" resultMap="boardMap">
+		SELECT * FROM BOARD WHERE B_STATUS= 'Y' ORDER BY B_CREATE_DATE DESC
+	</select>
+	<select id="selectBoardDetail" resultMap="boardMap">
+		SELECT * FROM BOARD LEFT JOIN (SELECT * FROM REPLY WHERE R_STATUS ='Y') R ON B_NO =R.REF_BNO WHERE B_NO=#{boardNo} AND B_STATUS = 'Y' ORDER BY R_CREATE_DATE DESC
+	</select>
+	<update id="plusBoardCount">
+		UPDATE BOARD SET B_COUNT = B_COUNT +1 WHERE B_NO = #{boardNo}
+	</update>
+	<update id="updateBoard">
+		UPDATE BOARD SET B_TITLE = #{boardTitle}, B_CONTENT = #{boardContent}, B_CREATE_DATE = CURRENT_TIMESTAMP WHERE B_NO =#{boardNo}
+	</update>
+	<update id="deleteBoard">
+		UPDATE BOARD SET B_STATUS = 'N' WHERE B_NO = #{boardNo}
+	</update>
+	<insert id="insertReply">
+		INSERT INTO REPLY(REF_BNO,R_AUTHOR,R_CONTENT,R_CREATE_DATE,R_STATUS) VALUES(#{refBno},#{replyAuthor},#{replyContent},DEFAULT,DEFAULT)
+	</insert>
+	<resultMap type="Reply" id="replyMap">
+		<id property="replyNo" column="R_NO"/>
+		<result property="refBno" column="REF_BNO"/>
+		<result property="replyAuthor" column="R_AUTHOR"/>
+		<result property="replyContent" column="R_CONTENT"/>
+		<result property="replyCreateDate" column="R_CREATE_DATE"/>
+		<result property="replyStatus" column="R_STATUS"/>
+	</resultMap>
+	<select id="getReplyList" resultMap="replyMap">
+		SELECT * FROM REPLY WHERE REF_BNO = #{boardNo} AND R_STATUS = 'Y' ORDER BY R_CREATE_DATE DESC
+	</select>
+	<update id="deleteReplyAjax">
+		UPDATE REPLY SET R_STATUS = 'N' WHERE R_NO = #{replyNo}
+	</update>
+	<update id="updateReplyCheck" parameterType="java.util.Arrays">
+		UPDATE REPLY SET CHECK_YN = 'Y' WHERE R_NO IN
+		<foreach collection="array" item="replyNoArray" open="(" separator="," close=")">
+			#{replyNoArray}
+		</foreach>
+	</update>
+</mapper>

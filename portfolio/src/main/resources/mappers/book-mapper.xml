@@ -1,0 +1,104 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BookMapper">
+	<resultMap type="Publisher" id="publisherMap">
+		<id property="pubNo" column="PUB_NO"/>
+		<result property="pubName" column="PUB_NAME"/>
+		<result property="pubPhone" column="PHONE"/>
+		<result property="dealYn" column="DEAL_YN"/>
+		<result property="createDate" column="CREATE_DATE"/>
+	</resultMap>
+	<select id="selectPubList" resultMap="publisherMap">
+		SELECT * FROM TB_PUBLISHER WHERE PUB_STATUS = 'Y'
+	</select>
+	<select id="ajaxSelectPubList" resultMap="publisherMap">
+		SELECT * FROM TB_PUBLISHER WHERE PUB_STATUS = 'Y' AND DEAL_YN = 'Y'
+	</select>
+	<insert id="insertPub">
+		INSERT INTO TB_PUBLISHER(PUB_NAME,PHONE,DEAL_YN,PUB_STATUS) VALUES(#{pubName},#{pubPhone},DEFAULT,DEFAULT)
+	</insert>
+	<insert id="insertBook">
+		INSERT INTO TB_BOOK(BK_TITLE,BK_AUTHOR,BK_PUB_NO,MAINCTG,SUBCTG,ISSUE_DATE,ORIGINAL_FILENAME,RENAME_FILENAME,CREATE_DATE,B_STATUS,RENT_COUNT) VALUES(#{bookTitle},#{author},#{publisherNo},#{mainCategory},#{subCategory},#{issueDate},#{originalFilename},#{renameFilename},DEFAULT,DEFAULT,DEFAULT)
+	</insert>
+	<resultMap type="Book" id="bookMap">
+		<id property="bookNo" column="BK_NO"/>
+		<result property="bookTitle" column="BK_TITLE"/>
+		<result property="author" column="BK_AUTHOR"/>
+		<result property="price" column="BK_PRICE"/>
+		<result property="publisherNo" column="PUB_NAME"/>
+		<result property="ISBN" column="ISBN"/>
+		<result property="page" column="PAGE"/>
+		<result property="mainCategory" column="MAIN_CATEGORY"/>
+		<result property="subCategory" column="SUB_CATEGORY"/>
+		<result property="issueDate" column="ISSUE_DATE"/>
+		<result property="rentYn" column="RENT_YN"/>
+		<result property="stock" column="STOCK"/>
+		<result property="originalFilename" column="ORIGINAL_FILENAME"/>
+		<result property="renameFilename" column="RENAME_FILENAME"/>
+	</resultMap>
+	<select id="selectBookList" resultMap="bookMap">
+		SELECT BK_NO,BK_TITLE,BK_AUTHOR,ISSUE_DATE,RENT_YN, (SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO)AS PUB_NAME,IFNULL((SELECT MAIN_CAT_NAME FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = TB_BOOK.MAINCTG),'')AS MAIN_CATEGORY, IFNULL((SELECT SUB_CAT_NAME FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = TB_BOOK.SUBCTG),'')AS SUB_CATEGORY FROM TB_BOOK WHERE B_STATUS= 'Y' ORDER BY CREATE_DATE DESC
+	</select>
+		<!-- SELECT TB_BOOK.*, (SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO AND PUB_STATUS= 'Y')AS PUB_NAME,(SELECT MAIN_CAT_NAME FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = TB_BOOK.MAINCTG)AS MAIN_CATEGORY, (SELECT SUB_CAT_NAME FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = TB_BOOK.SUBCTG)AS SUB_CATEGORY, IFNULL(RENT_YN,'N')AS RENT_YN FROM TB_BOOK LEFT JOIN (SELECT RENT_BOOK_NO, RENT_YN FROM (SELECT RENT_BOOK_NO, MAX(RENT_DATE)M FROM TB_RENT GROUP BY RENT_BOOK_NO HAVING MAX(RENT_DATE))R JOIN TB_RENT USING(RENT_BOOK_NO) WHERE R.M= TB_RENT.RENT_DATE)SUB ON SUB.RENT_BOOK_NO = TB_BOOK.BK_NO WHERE B_STATUS= 'Y' ORDER BY CREATE_DATE DESC
+	</select> -->
+	<resultMap type="Category" id="categoryMap">
+		<id property= "catNo" column="MAIN_CAT_NO"/>
+		<result property="catName" column="MAIN_CAT_NAME"/>
+		<collection property="subCategory" ofType="Category" resultMap="subCatMap"></collection>
+	</resultMap>
+	<resultMap type="Category" id="subCatMap">
+		<id property="catNo" column="SUB_CAT_NO"/>
+		<result property="catName" column="SUB_CAT_NAME"/>
+	</resultMap>
+	<select id="selectCat" resultMap="categoryMap">
+		SELECT * FROM TB_MAIN_CATEGORY LEFT JOIN TB_SUB_CATEGORY USING(MAIN_CAT_NO)
+	</select>
+	<select id="selectBookDetail" resultMap="bookMap">
+		SELECT *, CONCAT_WS(',',TB_BOOK.BK_PUB_NO,(SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO))AS PUB_NAME,CONCAT_WS(',',MAINCTG,(SELECT MAIN_CAT_NAME FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = TB_BOOK.MAINCTG))AS MAIN_CATEGORY, CONCAT_WS(',',SUBCTG,(SELECT SUB_CAT_NAME FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = TB_BOOK.SUBCTG))AS SUB_CATEGORY FROM TB_BOOK WHERE BK_NO = #{bookNo} AND B_STATUS='Y'
+	</select>
+		<!-- SELECT TB_BOOK.*, CONCAT_WS(',',TB_BOOK.BK_PUB_NO,(SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO AND PUB_STATUS = 'Y'))AS PUB_NAME,CONCAT_WS(',',MAINCTG,(SELECT MAIN_CAT_NAME FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = TB_BOOK.MAINCTG))AS MAIN_CATEGORY, CONCAT_WS(',',SUBCTG,(SELECT SUB_CAT_NAME FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = TB_BOOK.SUBCTG))AS SUB_CATEGORY, IFNULL(RENT_YN,'N')AS RENT_YN FROM TB_BOOK LEFT JOIN (SELECT RENT_BOOK_NO, RENT_YN FROM (SELECT RENT_BOOK_NO, MAX(RENT_DATE)M FROM TB_RENT GROUP BY RENT_BOOK_NO HAVING MAX(RENT_DATE))R JOIN TB_RENT USING(RENT_BOOK_NO) WHERE R.M= TB_RENT.RENT_DATE)SUB ON SUB.RENT_BOOK_NO = TB_BOOK.BK_NO WHERE BK_NO = #{bookNo} AND B_STATUS='Y'
+	</select> -->
+	<select id="selectPub" resultMap="publisherMap">
+		SELECT * FROM TB_PUBLISHER WHERE PUB_NO = #{pubNo}
+	</select>
+	<update id="updatePub">
+		UPDATE TB_PUBLISHER SET PUB_NAME = #{pubName}, PHONE=#{pubPhone}, DEAL_YN=#{dealYn} WHERE PUB_NO = #{pubNo}
+	</update>
+	<update id="deletePub">
+		UPDATE TB_PUBLISHER SET PUB_STATUS = 'N' WHERE PUB_NO = #{pubNo}
+	</update>
+	<update id="updateBook">
+		UPDATE TB_BOOK SET BK_TITLE=#{bookTitle}, BK_AUTHOR=#{author}, BK_PUB_NO=#{publisherNo}, MAINCTG=#{mainCategory}, SUBCTG=#{subCategory}, ISSUE_DATE=#{issueDate}, ORIGINAL_FILENAME=#{originalFilename}, RENAME_FILENAME=#{renameFilename} WHERE BK_NO = #{bookNo}
+	</update>
+	<update id="deleteBook">
+		UPDATE TB_BOOK SET B_STATUS = 'N' WHERE BK_NO=#{bookNo}
+	</update>
+	<select id="searchBookList" resultMap="bookMap">
+		SELECT *, (SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO)AS PUB_NAME,(SELECT MAIN_CAT_NAME FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = TB_BOOK.MAINCTG)AS MAIN_CATEGORY, (SELECT SUB_CAT_NAME FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = TB_BOOK.SUBCTG)AS SUB_CATEGORY FROM TB_BOOK
+		<where>
+			B_STATUS = 'Y'
+			<if test="condition.equalsIgnoreCase('book')">
+				AND BK_TITLE LIKE CONCAT('%', #{content}, '%')
+			</if>
+			<if test="condition.equalsIgnoreCase('author')">
+				AND BK_AUTHOR LIKE CONCAT('%', #{content}, '%')
+			</if>
+			<if test="condition.equalsIgnoreCase('publisher')">
+				AND (SELECT PUB_NAME FROM TB_PUBLISHER WHERE PUB_NO = TB_BOOK.BK_PUB_NO) LIKE CONCAT('%', #{content}, '%')
+			</if>
+		</where>
+		 ORDER BY CREATE_DATE DESC
+	</select>
+	<resultMap type="Book" id="wishBookMap">
+		<id property="bookNo" column="W_NO"/>
+		<result property="bookTitle" column="W_BOOK_TITLE"/>
+		<result property="author" column="W_AUTHOR"/>
+		<result property="publisherNo" column="W_PUBLISHER"/>
+		<result property="ISBN" column="USER_ID"/>
+		<result property="issueDate" column="W_CREATE_DATE"/>
+	</resultMap>
+	<select id="selectWishBookList" resultMap="wishBookMap">
+		SELECT * FROM TB_WISH_BOOK ORDER BY W_CREATE_DATE DESC
+	</select>
+</mapper>
