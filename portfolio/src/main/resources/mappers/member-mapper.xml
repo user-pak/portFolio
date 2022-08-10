@@ -16,14 +16,15 @@
 		<id property="rentNo" column="RENT_NO"/>
 		<result property="refBno" column="RENT_BOOK_NO"/>
 		<result property="bookName" column="BK_TITLE"/>
-		<result property="refMemId" column="RENT_MEMBER_ID"/>
+		<result property="refMemId" column="ID_AND_AUTHOR"/>
 		<result property="rentDate" column="RENT_DATE"/>
 		<result property="returnDate" column="RETURN_DATE"/>
 		<result property="returnCk" column="RETURN_CK"/>
 	</resultMap>
 	<select id="historyRentList" resultMap="rentMap">
-		SELECT TB_RENT.*, BK_TITLE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO
+		<!-- SELECT TB_RENT.*, BK_TITLE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO -->
 		<!-- SELECT RENT_NO, BK_TITLE,RENT_BOOK_NO, RENT_MEMBER_ID, RENT_DATE,(CASE WHEN RETURN_CK =1 THEN '반납완료' ELSE IF(RETURN_DATE <![CDATA[ < ]]> CURRENT_TIMESTAMP,'연체중',RETURN_DATE) END)AS RETURN_DATE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO-->
+		SELECT TB_RENT.*, CONCAT_WS(',',RENT_MEMBER_ID,BK_AUTHOR)AS ID_AND_AUTHOR, BK_TITLE FROM TB_RENT LEFT JOIN TB_BOOK ON RENT_BOOK_NO = BK_NO
 		<where>	
 			<if test="id != null">
 				 RENT_MEMBER_ID = #{id}

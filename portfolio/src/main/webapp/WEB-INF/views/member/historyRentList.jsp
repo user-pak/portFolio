@@ -51,7 +51,7 @@
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">개인 대출 정보를 볼 수 있습니다</h6>
-                                    
+                            	반납예정일이 남아있는 도서를 클릭하면 반납할지 묻습니다<br>반납완료된 도서는 반납한 날짜를 보여줍니다          
                         </div>
                         
                         <div class="card-body">
@@ -62,9 +62,14 @@
                                         <tr>
                                             <th>도서번호</th>
                                             <th>도서명</th>
-                                            <%-- <c:if test="${!empty role and role eq 'admin' }"> --%>
+                                             <c:if test="${!empty role and role eq 'admin' }">
+                                             <c:set var="idCheck" value='0'/>
                                             <th>대출한 회원 아이디</th>
-                                           <%--  </c:if> --%>
+                                           	</c:if>
+                                           	<c:if test="${!empty role and role ne 'admin' }">
+                                           	<c:set var="idCheck" value='1'/>
+                                           	<th>저자명</th>
+                                           	</c:if>
                                             <th>대출 일자</th>
                                             <th>반납 예정일</th>                                          
                                         </tr>
@@ -132,7 +137,15 @@
 				columns:[
 					{data:"refBno"},
 					{data:"bookName"},
-					{data:"refMemId"},
+					{data:"refMemId",
+						render: function(data) {
+							data = data.split(',');
+							if(${idCheck} == 0) {								
+								return data[0];
+							}else {
+								return data[1];
+							}
+						}},
 					{data:"rentDate"},
 					{data:"returnDate",
 						  render: function(data, type, row) {
