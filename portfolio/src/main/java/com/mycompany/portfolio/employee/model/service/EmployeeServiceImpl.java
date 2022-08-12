@@ -25,9 +25,9 @@ public class EmployeeServiceImpl implements EmployeeService{
 	}
 
 	@Override
-	public ArrayList<Member> selectMemberList() {
+	public ArrayList<Member> selectMemberList(String adminId) {
 		// TODO Auto-generated method stub
-		return dao.selectMemberList();
+		return dao.selectMemberList(adminId);
 	}
 
 	@Override

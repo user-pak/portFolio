@@ -15,7 +15,7 @@ public interface EmployeeService {
 
 	public abstract ArrayList<Employee> selectEmployeeList();
 
-	public abstract ArrayList<Member> selectMemberList();
+	public abstract ArrayList<Member> selectMemberList(String adminId);
 
 	public abstract int registerEmp(Employee emp);
 

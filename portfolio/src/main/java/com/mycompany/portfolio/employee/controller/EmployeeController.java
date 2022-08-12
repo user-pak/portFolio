@@ -27,8 +27,8 @@ public class EmployeeController {
 
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
-	@Value("${adminId}")
-	private String admin;
+	/* @Value("${adminId}") */
+	private String adminId = "admin";
 
 	@Autowired
 	private EmployeeService service;
@@ -50,7 +50,7 @@ public class EmployeeController {
 	}
 	@RequestMapping("selectMemberList.do")
 	public ModelAndView selectMemberList(ModelAndView mav) {
-		ArrayList<Member> memberList = service.selectMemberList();
+		ArrayList<Member> memberList = service.selectMemberList(adminId);
 		mav.addObject("memberList", new GsonBuilder().setDateFormat("yyyy년MM월dd일").create().toJson(memberList)).setViewName("employee/selectMemberList");
 		return mav;
 	}

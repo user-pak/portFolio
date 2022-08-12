@@ -25,9 +25,9 @@ public class EmployeeDao {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ArrayList<Member> selectMemberList() {
+	public ArrayList<Member> selectMemberList(String adminId) {
 		// TODO Auto-generated method stub
-		return (ArrayList)sqlSession.selectList("EmployeeMapper.selectMemberList");
+		return (ArrayList)sqlSession.selectList("EmployeeMapper.selectMemberList", adminId);
 	}
 
 	public int registerEmp(Employee emp) {

@@ -187,16 +187,13 @@ span.price {
 				<label for="manager">관리자</label><br>
             	<div class="form-group">
 				  <select class="form-control" id="sel3" name="managerId">
+				  <option value=''>관리자없음</option>
 				  <c:forEach items="${managerList }" var="manager" varStatus="status">
 				  	 <c:if test="${manager.MEMBER_ID eq fn:substringBefore(employee.managerId, ',')}">
 				  		<c:set var="selected" value="${status.index }"/>
 				  	 </c:if>
 				  	<option id="${status.index }" value="${manager.MEMBER_ID }">${manager.NAME_JOB}</option>
-<%-- 				  	<c:if test="${manager.MEMBER_ID ne employee.managerId }">
-				  	<option id="opt1" value="${manager.MEMBER_ID }">${manager.NAME_JOB}</option>
-				  	</c:if> --%>
 				  </c:forEach>
-<%-- 		       		<option id="opt1" value="${employee.managerId }">${employee.managerId }</option> --%>
 				  </select>
 				</div>
             <label for="ccnum">직급</label>
@@ -278,7 +275,7 @@ span.price {
 			$("#sel2 option[value='${employee.jobCode}']").prop("selected", true);
 		}
 		if("${selected}" != '') {
-			$("#sel3").children().eq("${selected}").attr("selected", true);
+			$("#sel3").children().eq("${selected}").prop("selected", true);
 		}
 
 		$("#sel1").on("change, click", function(){
