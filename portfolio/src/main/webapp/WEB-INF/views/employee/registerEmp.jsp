@@ -119,7 +119,15 @@ span.price {
 <body>
 
 <h2>신입사원 등록화면</h2>
-<p>기본정보는 수정할 수 없습니다<br>급여를 입력하면 급여등급이 자동으로 부여됩니다<br>등록하기를 클릭하면 자동으로 사원번호가 부여됩니다</p>
+<div class ="row">
+<div class="col-50">
+<p>기본정보는 사원이 등록/수정한 내용이며 관리자는 조회만 가능합니다</p>
+</div>
+<div class="col-50">
+<p>부서와 직급은 '개인정보관리/사원등록옵션'에서 미리 등록해 두어야 선택할 수 있습니다<br>부서를 선택하면 해당부서의 전 직원이 관리자후보가 됩니다<br>급여를 입력하면 등록해둔 급여등급이  부여됩니다<br>등록하기를 클릭하면 자동으로 사원번호가 부여됩니다</p>
+</div>
+</div>
+
 <div class="row">
   <div class="col-75">
     <div class="container">
@@ -143,7 +151,7 @@ span.price {
 
           </div>
 
-          <div class="col-75">
+          <div class="col-50">
             <h3>사원정보</h3>
             <label for="cname">부서</label>
 				<div class="form-group">
@@ -154,13 +162,11 @@ span.price {
 				  	</c:forEach>
 				  </select>
 				</div>	
-<!-- 			<label for="manager">관리자</label><br>
+ 			<label for="manager">관리자</label><br>
             	<div class="form-group">
-				  <select class="form-control" id="sel3" name="managerId">
-
-				    
+				  <select class="form-control" id="sel3" name="managerId">			    
 				  </select>
-				</div> -->
+				</div> 
             <label for="ccnum">직급</label>
             	<div class="form-group">
 				  <select class="form-control" id="sel2" name="jobCode">
@@ -190,7 +196,32 @@ span.price {
     </div>
   </div>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-
+<script type="text/javascript">
+	$(function() {
+		$("#sel1").on("change, click", function(){
+			$.ajax({
+				url:"selectManager.do",
+				method:"post",
+				dataType:"json",
+				data: {deptCode: $("#sel1").val()},		
+				success:function(managerList) {
+					$select = $("#sel3");
+					$select.html('');
+					$select.append("<option value=''>관리자없음</option>");
+					var managerarr = $.makeArray(managerList);			
+					$.map(managerarr, function(element,index) {
+						$optHtml = "<option value=" +element.MEMBER_ID +">"+element.NAME_JOB+"</option>";						
+						$select.append($optHtml);
+					})
+					
+				},
+				error: function() {
+					alert("error");
+				}
+			})
+		})
+	})
+</script>
 
 </body>
 </html>
