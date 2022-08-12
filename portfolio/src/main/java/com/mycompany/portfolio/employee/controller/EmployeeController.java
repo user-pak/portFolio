@@ -78,7 +78,7 @@ public class EmployeeController {
 	@RequestMapping("updateEmpJsp.do")
 	public ModelAndView updateEmpJsp(String empNo, ModelAndView mav) {
 		Employee employee = service.selectEmployee(empNo);
-		mav.addObject("employee", employee).addObject("deptList", service.selectDeptList()).addObject("jobList", service.selectJobList()).setViewName("employee/updateEmp");
+		mav.addObject("employee", employee).addObject("deptList", service.selectDeptList()).addObject("jobList", service.selectJobList()).addObject("managerList",service.selectManager(new Employee(employee.getEmpNo(),employee.getDeptCode()))).setViewName("employee/updateEmp");
 		return mav;
 	}
 	@RequestMapping("updateEmp.do")

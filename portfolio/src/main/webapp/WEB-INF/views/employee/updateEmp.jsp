@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 
 <html>
@@ -119,7 +120,16 @@ span.price {
 <body>
 
 <h2>사원정보조회및 수정하기</h2>
-<p>사원의 기본정보는 수정할 수 없습니다<br>급여를 입력하면 급여등급이 자동으로 부여됩니다<br>부서를 선택하면 해당부서의 관리자(본인보다 직급이 높은 사원) 목록을 ajax로 불러옵니다</p>
+<div class ="row">
+<div class="col-50">
+<br><br>
+<p>기본정보는 사원이 등록/수정한 내용을 조회한 것이며 관리자는 수정할 수 없습니다</p>
+</div>
+<div class="col-50">
+<p>부서와 직급은 '개인정보관리/사원등록옵션'에서 미리 등록해 두어야 수정할 수 있습니다<br>사원등록 후 부서를 선택하면 해당직원보다 직급이 높은 직원을 관리자로 선택할 수 있게 됩니다<br>
+<br>급여를 수정하면 등록해 둔 급여등급이 자동으로 부여됩니다</p>
+</div>
+</div>
 <div class="row">
   <div class="col-75">
     <div class="container">
@@ -143,7 +153,7 @@ span.price {
 
           </div>
 
-          <div class="col-75">
+          <div class="col-50">
             <h3>사원정보</h3>
             <input type="hidden" name="empNo" value="${employee.empNo }">
             <label for="cname">부서</label>
@@ -177,7 +187,16 @@ span.price {
 				<label for="manager">관리자</label><br>
             	<div class="form-group">
 				  <select class="form-control" id="sel3" name="managerId">
-		       		<option id="opt1" value="${employee.managerId }">${employee.managerId }</option>
+				  <c:forEach items="${managerList }" var="manager" varStatus="status">
+				  	 <c:if test="${manager.MEMBER_ID eq fn:substringBefore(employee.managerId, ',')}">
+				  		<c:set var="selected" value="${status.index }"/>
+				  	 </c:if>
+				  	<option id="${status.index }" value="${manager.MEMBER_ID }">${manager.NAME_JOB}</option>
+<%-- 				  	<c:if test="${manager.MEMBER_ID ne employee.managerId }">
+				  	<option id="opt1" value="${manager.MEMBER_ID }">${manager.NAME_JOB}</option>
+				  	</c:if> --%>
+				  </c:forEach>
+<%-- 		       		<option id="opt1" value="${employee.managerId }">${employee.managerId }</option> --%>
 				  </select>
 				</div>
             <label for="ccnum">직급</label>
@@ -258,6 +277,10 @@ span.price {
 		if("${employee.jobCode}" != null) {
 			$("#sel2 option[value='${employee.jobCode}']").prop("selected", true);
 		}
+		if("${selected}" != '') {
+			$("#sel3").children().eq("${selected}").attr("selected", true);
+		}
+
 		$("#sel1").on("change, click", function(){
 			$.ajax({
 				url:"selectManager.do",
