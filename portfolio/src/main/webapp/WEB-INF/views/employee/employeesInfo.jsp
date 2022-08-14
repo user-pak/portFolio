@@ -48,7 +48,7 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">추가하기버튼을 클릭하여 새 코드를 입력하고 삭제할 코드는 체크한 뒤 저장하기 버튼을 클릭합니다</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">'추가하기'를 클릭하여 새 코드를 입력하거나 네모안의 내용은 수정하고 삭제할 코드는 체크한 뒤 '저장하기'를 클릭하면 실시간 반영됩니다</h6>
                                      <a href="javascript:saveData()" class="btn btn-primary btn-icon-split btn-sm">
                                         <span class="icon text-white-50">
                                             <i class="fas fa-arrow-right"></i>
@@ -61,6 +61,7 @@
                                         </span> -->
                                         <span class="text">전체초기화</span>
                                     </a> 
+                                    
                         </div>
                         
                         <div class="card-body">
@@ -84,7 +85,7 @@
         <tr>
         	
         		<td>${deptList.codeId }</td>
-        		<td>${deptList.codeName }</td>
+        		<td><input type="text" class="inputDept" value="${deptList.codeName }"></td>
         		<td><input type="checkbox"></td>
         </tr>
         </c:forEach>
@@ -113,7 +114,7 @@
         <tr>
         	
         		<td>${jobList.codeId }</td>
-        		<td>${jobList.codeName }</td>
+        		<td><input type="text" class="inputJob" value="${jobList.codeName }"></td>
         		<td><input type="checkbox"></td>
         </tr>
         </c:forEach>
@@ -143,9 +144,9 @@
         <tr>
         	
         		<td>${salGradeList.codeId }</td>
-        		<td>${salGradeList.codeName }</td>
-        		<td>${salGradeList.minSal }</td>
-        		<td>${salGradeList.maxSal }</td>
+        		<td><input type="text" class="inputSalGradeName" value="${salGradeList.codeName }"></td>
+        		<td><input type="number" class="inputSalGradeMinSal" value="${salGradeList.minSal }"></td>
+        		<td><input type="number" class="inputSalGradeMaxSal" value="${salGradeList.maxSal }"></td>
         		<td><input type="checkbox"></td>
         </tr>
         </c:forEach>
@@ -217,6 +218,9 @@
 	var deptDelArr = new Array();
 	var jobDelArr = new Array();
 	var salGradeDelArr = new Array();
+	var inputDeptArr = new Array();
+	var inputJobArr = new Array();
+	var inputSalGradeArr = new Array();
 	function insertDept() {
 		$deptHtml = "<tr id='dept'><td><input type='text' class='deptId validation' name='deptId' placeholder='부서코드' required></td><td><input type='text' class='deptName validation' name='codeName' placeholder='부서명' required></td></tr>";
 		$("#dept_table tbody").last().append($deptHtml);
@@ -265,16 +269,34 @@
 		$("#salGrade_table :checked").each(function() {
 			salGradeDelArr.push($(this).parent().parent().children().eq(0).text());
 		})
+		<c:forEach items="${selectDeptList}" var="inputDept" varStatus="status">
+			if("${inputDept.codeName}"  != $(".inputDept")['${status.index}'].value) {
+				inputDeptArr.push({codeId:'${inputDept.codeId}',codeName:$(".inputDept")['${status.index}'].value});
+			}
+		</c:forEach>
+		<c:forEach items="${selectJobList}" var="inputJob" varStatus="status">
+			if("${inputJob.codeName}" != $(".inputJob")['${status.index}'].value) {
+				inputJobArr.push({codeId:'${inputJob.codeId}',codeName:$(".inputJob")['${status.index}'].value});
+			}
+		</c:forEach>
+		<c:forEach items="${selectSalGradeList}" var="inputSalGrade" varStatus="status">
+			if("${inputSalGrade.codeName}" != $(".inputSalGradeName")['${status.index}'].value || "${inputSalGrade.minSal}" != $(".inputSalGradeMinSal")['${status.index}'].value || "${inputSalGrade.maxSal}" != $(".inputSalGradeMaxSal")['${status.index}'].value) {
+				inputSalGradeArr.push({codeId:'${inputSalGrade.codeId}',codeName:$(".inputSalGradeName")['${status.index}'].value, minSal:$(".inputSalGradeMinSal")['${status.index}'].value, maxSal:$(".inputSalGradeMaxSal")['${status.index}'].value});
+			}
+		</c:forEach>
 
  		const options = [deptArr,jobArr,salGradeArr]; 
 		const delList = [deptDelArr,jobDelArr,salGradeDelArr];
-		if(confirm("저장/삭제하시겠습니까")) {
+		const updateList = [inputDeptArr,inputJobArr,inputSalGradeArr];
+
+		if(confirm("저장하시겠습니까")) {
 			$.ajax({
 				url:"insertEmployeeOptions.do",
 				method:"post",
 				dataType:"json",
 				data:{options:JSON.stringify(options),
-					  delList:JSON.stringify(delList)
+					  delList:JSON.stringify(delList),
+					  updateList:JSON.stringify(updateList)
 				},
 				complete:function() {
 					deptArr = new Array();
@@ -283,6 +305,9 @@
 					deptDelArr = new Array();
 					jobDelArr = new Array();
 					salGradeDelArr = new Array();
+					inputDeptArr = new Array();
+					inputJobArr = new Array();
+					inputSalGradeArr = new Array();
 				},		
 				success:function(msg) {
 					alert(msg);
@@ -293,8 +318,6 @@
 				}
 			}) 
 		}
- 		
-
 	}
 	
 </script>

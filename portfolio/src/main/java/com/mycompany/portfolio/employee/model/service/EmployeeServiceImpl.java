@@ -126,4 +126,22 @@ public class EmployeeServiceImpl implements EmployeeService{
 		return dao.deleteSalGradeDelList(salGradeDelList);
 	}
 
+	@Override
+	public int updateDept(ArrayList<EmployeeOption> modDeptList) {
+		// TODO Auto-generated method stub
+		return dao.updateDept(modDeptList);
+	}
+
+	@Override
+	public int updateJob(ArrayList<EmployeeOption> modJobList) {
+		// TODO Auto-generated method stub
+		return dao.updateJob(modJobList);
+	}
+
+	@Override
+	public int updateSalGrade(ArrayList<EmployeeOption> modSalGradeList) {
+		// TODO Auto-generated method stub
+		return dao.updateSalGrade(modSalGradeList);
+	}
+
 }

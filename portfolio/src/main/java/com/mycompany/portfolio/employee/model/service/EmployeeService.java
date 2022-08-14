@@ -49,5 +49,11 @@ public interface EmployeeService {
 
 	public abstract int deleteSalGradeDelList(ArrayList<String> salGradeDelList);
 
+	public abstract int updateDept(ArrayList<EmployeeOption> modDeptList);
+
+	public abstract int updateJob(ArrayList<EmployeeOption> modJobList);
+
+	public abstract int updateSalGrade(ArrayList<EmployeeOption> modSalGradeList);
+
 	
 }

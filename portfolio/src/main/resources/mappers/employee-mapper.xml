@@ -153,4 +153,19 @@
 			#{salGradeDelList}
 		</foreach>
 	</delete>
+	<update id="updateDetp" parameterType="java.util.ArrayList">
+		<foreach collection="collection" item="modDeptList">
+			UPDATE DEPARTMENT SET DEPT_TITLE = #{modDeptList.codeName} WHERE DEPT_ID = #{modDeptList.codeId};
+		</foreach>
+	</update>
+	<update id="updateJob" parameterType="java.util.ArrayList">
+		<foreach collection="collection" item="modJobList">
+			UPDATE JOB SET JOB_NAME = #{modJobList.codeName} WHERE JOB_CODE = #{modJobList.codeId};
+		</foreach>
+	</update>
+	<update id="updateSalGrade" parameterType="java.util.ArrayList">
+		<foreach collection="collection" item="modSalGradeList">
+			UPDATE SAL_GRADE SET MIN_SAL = #{modSalGradeList.minSal}, MAX_SAL = #{modSalGradeList.maxSal}, SAL_NAME = #{modSalGradeList.codeName} WHERE SAL_LEVEL = #{modSalGradeList.codeId};
+		</foreach>
+	</update>
 </mapper>

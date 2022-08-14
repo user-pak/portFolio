@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -70,7 +71,7 @@ public class EmployeeController {
 	}
 	@ResponseBody
 	@RequestMapping("selectManager.do")
-	public String selectManager(String deptCode, String empNo) {	
+	public String selectManager(String deptCode, @RequestParam(required=false)String empNo) {	
 		Employee manager = new Employee(empNo, deptCode);
 		List<Map<String, String>> managers = service.selectManager(manager);
 		return new Gson().toJson(managers);
@@ -120,7 +121,7 @@ public class EmployeeController {
 	@ResponseBody
 	@RequestMapping("insertEmployeeOptions.do")
 //	public String insertEmployeeOptions(String deptOpt, String jobOpt, String salGradeOpt) {
-	public String insertEmployeeOptions(String options, String delList) {
+	public String insertEmployeeOptions(String options, String delList, String updateList) {
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create(); 	
 	    Type optType = new TypeToken<ArrayList<ArrayList<EmployeeOption>>>(){}.getType();
 		ArrayList<ArrayList<EmployeeOption>> optList = gson.fromJson(options, optType);
@@ -133,7 +134,7 @@ public class EmployeeController {
 		ArrayList<EmployeeOption> deptList = optList.get(0);
 		ArrayList<EmployeeOption> jobList = optList.get(1);
 		ArrayList<EmployeeOption> salGradeList = optList.get(2);
-
+		
 		int deptResult = 0; int jobResult = 0; int salGradeResult = 0;
 		if(!deptList.isEmpty()) {
 			deptResult = service.insertDeptList(deptList);
@@ -159,6 +160,20 @@ public class EmployeeController {
 		if(!salGradeDelList.isEmpty()) {
 			salGradeDelResult = service.deleteSalGradeDelList(salGradeDelList);
 		}
-		return gson.toJson("부서 " + deptResult + "건, 직급 " + jobResult + "건, 급여등급 " + salGradeResult +"건이 저장되었습니다 \n" + "부서 " + deptDelResult + "건, 직급 " + jobDelResult + "건, 급여등급 " + salGradeDelResult + "건이 삭제되었습니다");
+		ArrayList<ArrayList<EmployeeOption>> modList = gson.fromJson(updateList, optType);
+		ArrayList<EmployeeOption> modDeptList = modList.get(0);
+		ArrayList<EmployeeOption> modJobList = modList.get(1);
+		ArrayList<EmployeeOption> modSalGradeList = modList.get(2);
+		int updateDeptResult = 0; int updateJobResult = 0; int updateSalGradeResult = 0;
+		if(!modDeptList.isEmpty()) {
+			updateDeptResult = service.updateDept(modDeptList);
+		}
+		if(!modJobList.isEmpty()) {
+			updateJobResult = service.updateJob(modJobList);
+		}
+		if(!modSalGradeList.isEmpty()) {
+			updateSalGradeResult = service.updateSalGrade(modSalGradeList);
+		}
+		return gson.toJson("부서 " + deptResult + "건, 직급 " + jobResult + "건, 급여등급 " + salGradeResult +"건이 추가되었습니다 \n" + "부서 " + updateDeptResult + "건, 직급 " + updateJobResult + "건, 급여등급 " + updateSalGradeResult +"건이 수정되었습니다 \n" + "부서 " + deptDelResult + "건, 직급 " + jobDelResult + "건, 급여등급 " + salGradeDelResult + "건이 삭제되었습니다");
 	}
 }

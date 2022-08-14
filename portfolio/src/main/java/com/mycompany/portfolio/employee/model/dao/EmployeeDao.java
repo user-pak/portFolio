@@ -114,6 +114,21 @@ public class EmployeeDao {
 		return sqlSession.delete("EmployeeMapper.deleteSalGradeDelList",salGradeDelList);
 	}
 
+	public int updateDept(ArrayList<EmployeeOption> modDeptList) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("EmployeeMapper.updateDetp", modDeptList);
+	}
+
+	public int updateJob(ArrayList<EmployeeOption> modJobList) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("EmployeeMapper.updateJob", modJobList);
+	}
+
+	public int updateSalGrade(ArrayList<EmployeeOption> modSalGradeList) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("EmployeeMapper.updateSalGrade", modSalGradeList);
+	}
+
 	
 	
 }
