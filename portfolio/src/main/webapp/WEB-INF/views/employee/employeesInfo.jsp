@@ -310,7 +310,7 @@
 					inputSalGradeArr = new Array();
 				},		
 				success:function(msg) {
-					alert(msg);
+					alert(msg != ''?msg:"변경사항이 없습니다");
 					location.href="employeeInfo.do";
 				},
 				error:function() {

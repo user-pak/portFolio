@@ -174,6 +174,8 @@ public class EmployeeController {
 		if(!modSalGradeList.isEmpty()) {
 			updateSalGradeResult = service.updateSalGrade(modSalGradeList);
 		}
-		return gson.toJson("부서 " + deptResult + "건, 직급 " + jobResult + "건, 급여등급 " + salGradeResult +"건이 추가되었습니다 \n" + "부서 " + updateDeptResult + "건, 직급 " + updateJobResult + "건, 급여등급 " + updateSalGradeResult +"건이 수정되었습니다 \n" + "부서 " + deptDelResult + "건, 직급 " + jobDelResult + "건, 급여등급 " + salGradeDelResult + "건이 삭제되었습니다");
+//		return gson.toJson("부서 " + deptResult + "건, 직급 " + jobResult + "건, 급여등급 " + salGradeResult +"건이 추가되었습니다 \n" + "부서 " + updateDeptResult + "건, 직급 " + updateJobResult + "건, 급여등급 " + updateSalGradeResult +"건이 수정되었습니다 \n" + "부서 " + deptDelResult + "건, 직급 " + jobDelResult + "건, 급여등급 " + salGradeDelResult + "건이 삭제되었습니다");
+		return gson.toJson((deptResult>0?" 부서":"") + (jobResult>0?" 직급":"") +(salGradeResult>0?" 급여등급":"") +(deptResult>0||jobResult>0||salGradeResult>0?"가(이) 추가되었습니다 \n":"") + (updateDeptResult>0?" 부서":"") + (updateJobResult>0?" 직급":"") + (updateSalGradeResult>0?" 급여등급":"") + (updateDeptResult>0||updateJobResult>0||updateSalGradeResult>0?"가(이) 수정되었습니다 \n":"") + (deptDelResult>0?" 부서":"") + (jobDelResult>0?" 직급":"") + (salGradeDelResult>0?" 급여등급":"") + (deptDelResult>0||jobDelResult>0||salGradeDelResult>0?"가(이) 삭제되었습니다":""));
 	}
+	
 }
