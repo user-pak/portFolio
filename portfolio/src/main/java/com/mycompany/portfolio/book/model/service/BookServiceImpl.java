@@ -99,5 +99,41 @@ public class BookServiceImpl implements BookService{
 		return dao.ajaxSelectPubList();
 	}
 
+	@Override
+	public int insertMainCatetories(ArrayList<Category> mainInputs) {
+		// TODO Auto-generated method stub
+		return dao.insertMainCatetories(mainInputs);
+	}
+
+	@Override
+	public int insertSubCategories(ArrayList<Category> subInputs) {
+		// TODO Auto-generated method stub
+		return dao.insertSubCategories(subInputs);
+	}
+
+	@Override
+	public int updateMainCategories(ArrayList<Category> updateMainList) {
+		// TODO Auto-generated method stub
+		return dao.updateMainCategories(updateMainList);
+	}
+
+	@Override
+	public int updateSubCategories(ArrayList<Category> updateSubList) {
+		// TODO Auto-generated method stub
+		return dao.updateSubCategories(updateSubList);
+	}
+
+	@Override
+	public int delMainCategories(String[] delMainArray) {
+		// TODO Auto-generated method stub
+		return dao.delMainCategories(delMainArray);
+	}
+
+	@Override
+	public int delSubCategories(String[] delSubArray) {
+		// TODO Auto-generated method stub
+		return dao.delSubCategories(delSubArray);
+	}
+
 
 }

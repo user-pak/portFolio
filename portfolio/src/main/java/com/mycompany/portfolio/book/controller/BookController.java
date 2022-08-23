@@ -2,6 +2,7 @@ package com.mycompany.portfolio.book.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.mycompany.portfolio.book.model.service.BookService;
 import com.mycompany.portfolio.book.model.vo.Book;
+import com.mycompany.portfolio.book.model.vo.Category;
 import com.mycompany.portfolio.book.model.vo.Publisher;
 import com.mycompany.portfolio.book.model.vo.Search;
+import com.mycompany.portfolio.employee.model.vo.EmployeeOption;
 
 @Controller
 public class BookController {
@@ -233,5 +237,61 @@ public class BookController {
 	public ModelAndView selectCatList(ModelAndView mv) {
 		mv.addObject("catList", service.selectCat()).setViewName("book/selectCatList");
 		return mv;
+	}
+	@RequestMapping("insertCatJsp.do")
+	public ModelAndView insertCatJsp(ModelAndView mv) {
+		mv.addObject("catList", service.selectCat()).setViewName("book/insertCatForm");
+		return mv;
+	}
+	@ResponseBody
+	@RequestMapping(value="setCategories.do", produces="application/text;charset=utf-8")
+	public String setCategories(String setCategoryLists,String delMainCategories, String delSubCategories) {
+		Gson gson = new Gson();
+		Type categoryType = new TypeToken<ArrayList<ArrayList<Category>>>(){}.getType();
+		ArrayList<ArrayList<Category>> setLists = gson.fromJson(setCategoryLists, categoryType);
+		ArrayList<Category> mainInputs = setLists.get(0);
+		ArrayList<Category> subInputs = setLists.get(1);
+		ArrayList<Category> updateMainList = setLists.get(2);
+		ArrayList<Category> updateSubList = setLists.get(3);
+		String[] delMainArray = gson.fromJson(delMainCategories, String[].class);
+		String[] delSubArray = gson.fromJson(delSubCategories, String[].class);
+		int count = 0; int resultCount = 0;
+		if(!mainInputs.isEmpty()) {
+			count++;
+			int result = service.insertMainCatetories(mainInputs);
+			if(result > 0) { resultCount++;}
+		}
+		if(!subInputs.isEmpty()) {
+			count++;
+			int result = service.insertSubCategories(subInputs);
+			if(result>0) { resultCount++;}
+		}
+		if(!updateMainList.isEmpty()) {
+			count++;
+			int result = service.updateMainCategories(updateMainList);
+			if(result>0) { resultCount++;}
+		}
+		if(!updateSubList.isEmpty()) {
+			count++;
+			int result = service.updateSubCategories(updateSubList);
+			if(result>0) { resultCount++;}
+		}
+		if(delMainArray.length != 0) {
+			count++;
+			int result = service.delMainCategories(delMainArray);
+			if(result>0) { resultCount++;}
+		}
+		if(delSubArray.length != 0) {
+			count++;
+			int result = service.delSubCategories(delSubArray);
+			if(result>0) { resultCount++;}
+		}
+		if(count != resultCount) {
+			return "일부가 누락되었습니다 확인해 주세요";
+		}else {
+			return "성공적으로 저장되었습니다";
+		}
+		
+
 	}
 }

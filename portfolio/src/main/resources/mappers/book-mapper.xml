@@ -101,4 +101,36 @@
 	<select id="selectWishBookList" resultMap="wishBookMap">
 		SELECT * FROM TB_WISH_BOOK ORDER BY W_CREATE_DATE DESC
 	</select>
+	<insert id="insertMainCatetories" parameterType="java.util.ArrayList">
+		INSERT INTO TB_MAIN_CATEGORY VALUES
+		<foreach collection="collection" item="mainInputs" separator=",">
+			(#{mainInputs.catNo},#{mainInputs.catName})
+		</foreach>
+	</insert>
+	<insert id="insertSubCategories" parameterType="java.util.ArrayList">
+		INSERT INTO TB_SUB_CATEGORY VALUES
+		<foreach collection="collection" item="subInputs" separator=",">
+			(#{subInputs.catNo},#{subInputs.catName},SUBSTRING_INDEX(#{subInputs.catNo},'S',1))
+		</foreach>
+	</insert>
+	<update id="updateMainCategories" parameterType="java.util.ArrayList">
+		<foreach collection="collection" item="updateMainList">
+			UPDATE TB_MAIN_CATEGORY SET MAIN_CAT_NAME= #{updateMainList.catName} WHERE MAIN_CAT_NO = #{updateMainList.catNo};
+		</foreach>	
+	</update>
+	<update id="updateSubCategories" parameterType="java.util.ArrayList">
+		<foreach collection="collection" item="updateSubList">
+			UPDATE TB_SUB_CATEGORY SET SUB_CAT_NAME= #{updateSubList.catName} WHERE SUB_CAT_NO = #{updateSubList.catNo};
+		</foreach>
+	</update>
+	<delete id="delMainCategories" parameterType="java.util.Arrays">
+		<foreach collection="array" item="delMainArray">
+			DELETE FROM TB_MAIN_CATEGORY WHERE MAIN_CAT_NO = #{delMainArray};
+		</foreach>
+	</delete>
+	<delete id="delSubCategories" parameterType="java.util.Arrays">
+		<foreach collection="array" item="delSubArray">
+			DELETE FROM TB_SUB_CATEGORY WHERE SUB_CAT_NO = #{delSubArray};
+		</foreach>
+	</delete>
 </mapper>

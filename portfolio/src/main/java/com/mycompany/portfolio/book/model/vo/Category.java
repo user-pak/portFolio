@@ -8,7 +8,13 @@ public class Category {
 	private String catName;
 	private ArrayList<Category> subCategory;
 	
-	public Category() {}
+	public Category() {}	
+
+	public Category(String catNo, String catName) {
+		super();
+		this.catNo = catNo;
+		this.catName = catName;
+	}
 
 	public Category(String catNo, String catName, ArrayList<Category> subCategory) {
 		super();
