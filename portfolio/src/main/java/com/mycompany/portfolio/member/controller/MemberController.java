@@ -1,10 +1,4 @@
 package com.mycompany.portfolio.member.controller;
-
-
-
-
-
-
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpSession;
@@ -12,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +20,7 @@ import com.mycompany.portfolio.member.model.vo.Member;
 import com.mycompany.portfolio.member.model.service.MemberService;
 
 @Controller
+@ImportResource("classpath:properties-config.xml")
 public class MemberController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
@@ -52,8 +47,8 @@ public class MemberController {
 				session.setAttribute("newBadge", true);
 			}
 //			session.setAttribute("replyRefList",service.getReplyRefList(loginUser.getId()));
-			if(loginUser.getId().equals("admin")) {
-				session.setAttribute("role", "admin");
+			if(loginUser.getId().equals(admin)) {
+				session.setAttribute("role", admin);
 			}
 		//	session.setMaxInactiveInterval(60);
 			return "redirect: home.do";
@@ -93,7 +88,7 @@ public class MemberController {
 	public String historyRentList(HttpSession session, Model model) {
 		Member loginUser = (Member)session.getAttribute("loginUser");
 		String loginUserId = loginUser.getId();
-		if(loginUserId.equals("admin")) {
+		if(loginUserId.equals(admin)) {
 			loginUserId = null;
 		}
 		model.addAttribute("historyRentList", new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create().toJson(service.historyRentList(loginUserId)));
@@ -110,6 +105,9 @@ public class MemberController {
 		if (result > 0) {
 			session.setAttribute("loginUser", mem);
 			session.setAttribute("role", "user");
+			if(mem.getId().equals(admin)) {
+				session.setAttribute("role", admin);
+			}
 			model.addAttribute("msg", "회원이 되었습니다");
 			return "redirect: home.do";
 		} else {
