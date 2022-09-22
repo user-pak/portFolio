@@ -49,6 +49,9 @@
                             </div>
                         </div>
                     </form> -->
+					<div class="navbar-nav ml-auto">
+						<i class="fas fa-search fa-sm"><a href="messagingJsp.do">무엇이든 질문하고 대화하세요</a></i>
+					</div>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -78,6 +81,7 @@
                         </li> -->
 
                         <!-- Nav Item - Alerts -->
+
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -87,6 +91,7 @@
                                 <span class="badge badge-danger badge-counter" id="newSpan">new</span>
                                 </c:if>
                             </a>
+
                             <!-- Dropdown - Alerts -->
                             <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="alertsDropdown">

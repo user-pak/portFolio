@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
+import javax.swing.JApplet;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +31,13 @@ import com.mycompany.portfolio.member.model.vo.Member;
  * Handles requests for the application home page.
  */
 @Controller
-public class HomeController {
+public class HomeController extends JApplet {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5461916055592333093L;
+
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 		
 	/**
@@ -54,7 +62,7 @@ public class HomeController {
 		model.addAttribute("recentNotices", service.getRecentNotices());
 		model.addAttribute("topBoardTitle", service.getTopBoardTitle());
 		model.addAttribute("msg", msg);
-		
+		init();
 		return "home";
 	}
 	@RequestMapping("board.do")
@@ -111,5 +119,24 @@ public class HomeController {
 		return "common/error";
 		}
 	}
-	
+    //Called when this applet is loaded into the browser.
+	@Override
+    public void init() {
+        //Execute a job on the event-dispatching thread; creating this applet's GUI.
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    JLabel lbl = new JLabel("Hello World");
+                    add(lbl);
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("createGUI didn't complete successfully");
+        }
+    }
+	@RequestMapping("messagingJsp.do")
+	public String messagingJsp() {
+		return "home/messaging";
+	}
 }
+
