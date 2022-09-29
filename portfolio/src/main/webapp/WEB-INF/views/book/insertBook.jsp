@@ -47,7 +47,7 @@
     <div class="form-group">
       <label class="control-label col-sm-2" for="email">도서명:</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="email" placeholder="" name="bookTitle" value ="${book.bookTitle }" required>
+        <input type="text" class="form-control" id="email" placeholder="" name="bookTitle" required>
       </div>
     </div>
     <div class="form-group">
@@ -112,12 +112,11 @@
         </div>
       </div>
     </div>
-    <!-- <div class="form-group">
-      <label class="control-label col-sm-2" for="pwd">재고:</label>
+    <div class="form-group">
       <div class="col-sm-10">          
-        <input type="number" class="form-control" id="pageInput" placeholder="" name="stock" min=1 value=1>
+        <a href="imgFileList">이미지파일목록 조회하기</a>
       </div>
-    </div> -->
+    </div> 
     <!-- <div class="form-group">        
       <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
@@ -127,7 +126,7 @@
     </div> -->
     <div class="form-group">        
       <div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn" onclick="return isEmpty()" >등록하기</button>
+        <button type="submit" class="btn"  >등록하기</button>
         <button type="reset" class="btn">초기화</button>
         <button type="button" class="btn" onclick="location.href='home.do';">취소하기</button>
         <button type="button" class="btn" onclick="location.href='selectBookList.do';">전체도서목록보기</button>
